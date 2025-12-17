@@ -7,10 +7,6 @@
    USERNAME=your_username
    PASSWORD=your_password
    ```
-2. (Optional) Ensure the data output directories exist by running:
-   ```
-   python populate_data_dir.py
-   ```
 
 ## Download a single parquet file
 
@@ -24,4 +20,12 @@ Example:
 python clientside_data_endpoint.py trades_20251205 data/historical_trades
 ```
 
-This download should take roughly 20 minutes to complete.
+This download should take roughly 30 seconds to complete.
+
+## Populate the full data directory:
+
+Run:
+```
+python populate_data_dir.py
+```
+This should take about 20 minutes
