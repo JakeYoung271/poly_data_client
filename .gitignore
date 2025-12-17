@@ -1,4 +1,5 @@
 .env
 *.parquet
+*.parquet.*
 __pycache__/
 .DS_Store
