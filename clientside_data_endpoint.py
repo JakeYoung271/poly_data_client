@@ -6,6 +6,7 @@ from configs import DATA_ENDPOINT
 from dotenv import load_dotenv
 import os
 import tempfile
+import time
 
 try:
     import pyarrow.parquet as pq
@@ -23,14 +24,18 @@ def _validate_parquet(path: Path) -> None:
     pq.ParquetFile(path).metadata
 
 
-def _print_progress(downloaded: int, total: int | None, width: int = 30) -> None:
+def _print_progress(downloaded: int, total: int | None, start: float, width: int = 30) -> None:
+    mb_downloaded = downloaded / (1024 * 1024)
+    elapsed = max(time.monotonic() - start, 1e-6)
+    mb_per_sec = mb_downloaded / elapsed
     if total:
+        mb_total = total / (1024 * 1024)
         filled = int(width * downloaded / total)
         bar = "#" * filled + "-" * (width - filled)
         pct = int(downloaded * 100 / total)
-        msg = f"\r[{bar}] {pct:3d}% ({downloaded}/{total} bytes)"
+        msg = f"\r[{bar}] {pct:3d}% ({mb_downloaded:,.1f} MB / {mb_total:,.1f} MB) {mb_per_sec:,.1f} MB/s"
     else:
-        msg = f"\rDownloaded {downloaded} bytes"
+        msg = f"\rDownloaded {mb_downloaded:,.1f} MB ({mb_per_sec:,.1f} MB/s)"
     sys.stdout.write(msg)
     sys.stdout.flush()
 
@@ -50,13 +55,14 @@ def fetch_parquet_file(key: str, dest_dir: Path | None = None) -> Path:
             with request.urlopen(req) as resp:
                 total = resp.length
                 downloaded = 0
+                start_time = time.monotonic()
                 while True:
                     chunk = resp.read(1024 * 1024)
                     if not chunk:
                         break
                     tmp_file.write(chunk)
                     downloaded += len(chunk)
-                    _print_progress(downloaded, total)
+                    _print_progress(downloaded, total, start_time)
                 sys.stdout.write("\n")
         _validate_parquet(tmp_path)
         tmp_path.replace(out_path)
