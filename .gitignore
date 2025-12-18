@@ -3,3 +3,5 @@
 *.parquet.*
 __pycache__/
 .DS_Store
+*.ipynb
+*.ipynb.*
