@@ -18,6 +18,10 @@ load_dotenv()
 USERNAME = os.getenv("USERNAME")
 PASSWORD = os.getenv("PASSWORD")
 
+assert USERNAME, "Environment variable 'USERNAME' is not set. Check your .env file."
+assert PASSWORD, "Environment variable 'PASSWORD' is not set. Check your .env file."
+assert DATA_ENDPOINT, "DATA_ENDPOINT is not configured in configs.py."
+
 def _validate_parquet(path: Path) -> None:
     if pq is None:
         raise RuntimeError("pyarrow is required to validate parquet files.")
